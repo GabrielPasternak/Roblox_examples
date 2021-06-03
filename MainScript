@@ -1,0 +1,55 @@
+local dataStoreService = game:GetService("DataStoreService")
+local playerData = dataStoreService:GetDataStore("PlayerData")
+
+local function onPlayerAdded(player)
+	local leaderstats = Instance.new("Folder")
+	leaderstats.Name = "leaderstats"
+	leaderstats.Parent = player
+	
+	local money = Instance.new("IntValue")
+	money.Name = "Money"
+	money.Parent = leaderstats
+	
+	local exp = Instance.new("IntValue")
+	exp.Name = "Experience"
+	exp.Parent = leaderstats
+	
+	local level = Instance.new("IntValue")
+	level.Name = "Level"
+	level.Parent = leaderstats
+	
+	local playerUserID = "Player_" .. player.UserId
+	local data = playerData:GetAsync(playerUserID)
+	
+	if data then
+		money.Value = data["Money"]
+		exp.Value = data["Experience"]
+		level.Value = data["Level"]
+	else
+		money.Value = 0
+		exp.Value = 0
+		level.Value = 0
+	end
+end
+
+local function create_table(player)
+	local playerstats = {}
+	for _, stat in pairs(player.leaderstats:GetChildren()) do
+		playerstats[stat.Name] = stat.Value
+	end
+	return playerstats
+end
+
+local function onPlayerRemoving(player)
+	local playerstats = create_table(player)
+	local success, err = pcall(function()
+		local playerUserID = "Player_" .. player.UserId
+		playerData:SetAsync(playerUserID, playerstats)
+	end)
+	if not success then
+		warn("Saving error")
+	end
+end
+
+game.Players.PlayerAdded:Connect(onPlayerAdded)
+game.Players.PlayerRemoving:Connect(onPlayerRemoving)
