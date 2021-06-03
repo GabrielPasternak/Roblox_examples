@@ -1,0 +1,11 @@
+local MoneyBlock = script.Parent
+
+local function onTouched(part)
+	local humanoid = part.Parent:FindFirstChild("Humanoid")
+	local player = game.Players:GetPlayerFromCharacter(part.Parent)
+	if humanoid then
+		player.leaderstats.Money.Value += 1
+	end
+end
+
+script.Parent.Touched:Connect(onTouched)
